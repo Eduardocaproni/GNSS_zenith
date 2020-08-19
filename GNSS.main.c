@@ -97,11 +97,6 @@ int Parse_NMEAmessage(char* NMEAmessage, GNSS_loc_t* GNSSloc) {
     if (GNSSloc->latitude > 90 || GNSSloc->latitude < -90) return ERROR;
     if (GNSSloc->longitude > 180 || GNSSloc->longitude < -180) return ERROR;
 
-
-
-    printf("tempo: %d \nlat: %f \nlong: %f \nalt: %f", GNSSloc->tempo, GNSSloc->latitude, GNSSloc->longitude, GNSSloc->altitude);
-
-
     return SUCCESS;
 }
 
@@ -154,18 +149,15 @@ int main(void)
         HAL_I2C_Master_Receive(&hi2c1, GnssUblox, NMEAmessage, UBLOX_SIZE_MESSAGE, HAL_MAX_DELAY);
         //looking for GGA Message in the data received
         for (i = 0; i < UBLOX_SIZE_MESSAGE; i++) {
+            
             if ((char)NMEAmessage[i] == 'G' && (char)NMEAmessage[i + 1] == 'G' && (char)NMEAmessage[i + 2] == 'A') {
-
                 //Parsing data 
                 ReceiveFlag = Parse_NMEAmessage( (char*)&NMEAmessage[i + 4], &GNSSloc );
-
-                //testing error
-                if (!ReceiveFlag)   printf("falhou ao converter data ");
-
+                //leaving the for loop
                 break;
             }
         }
-        // testing if the parsing data succeeded to leave or receive more data 
+        // testing if the parsing data succeeded, to leave(if succeeded) or receive more data(if failed) 
         if (ReceiveFlag) break;
     }
 
